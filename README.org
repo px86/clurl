@@ -1,0 +1,27 @@
+#+TITLE: clurl - URL Shortener written in Common Lisp
+#+AUTHOR: Pushkar Raj
+#+EMAIL: px86@protonmail.com
+
+Yet another URL Shortener written in Common Lisp, (using PostgreSQL database). This is my first ever Common Lisp project. So, there is a high probability that the code will suck!.
+
+To build,
+
+#+begin_src shell
+  make
+#+end_src
+
+To run,
+
+#+begin_src shell
+  ./clurl
+#+end_src
+
+
+* Environment Variables
+These environment variables should be set (before starting the application), to establish a connection to a running PostgreSQL instance.
+
+- =CLURL_HOST=
+- =CLURL_PORT=
+- =CLURL_DB=
+- =CLURL_USERNAME=
+- =CLURL_PASSWORD=

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>clurl</title>
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        min-height: 100vh;
+        font-family: sans-serif;
+        background: linear-gradient(45deg, #0a4a74, #333333);
+      }
+
+      .container {
+        display: flex;
+        flex-direction: column;
+        min-height: 360px;
+        width: 580px;
+        margin: 3rem auto;
+        padding: 2.5rem 3.5rem 2rem 3.5rem;
+        background: white;
+        color: #333333;
+        border-radius: 5px;
+        box-shadow: 0 0 40px rgba(0, 0, 0, 0.6);
+      }
+
+      .subcontainer {
+        display: grid;
+        grid-template-columns: 10% 90%;
+        grid-row-gap: 0.8em;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      label,
+      p input {
+        display: inline-block;
+        font-size: 20px;
+        padding: 12px;
+        background: #f2f2f2;
+        border: none;
+        vertical-align: middle;
+      }
+
+      label {
+        grid-column: 1;
+        border-radius: 5px 0 0 5px;
+      }
+
+      input {
+        grid-column: 2;
+	outline: none;
+	background-color: #f2f2f2;
+	border: none !important;
+      }
+
+      input:focus {
+        outline: none;
+      }
+
+      button {
+        background: #007cc4;
+        color: white;
+        font-weight: bold;
+        padding: 12px;
+        border-radius: 5px;
+        border: none;
+        outline: none;
+        grid-column: 1 / 3;
+      }
+
+      #updates {
+        text-align: center;
+        margin-top: auto;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="subcontainer">
+        <label for="url" class="material-icons">link</label>
+        <input
+          id="url"
+          type="text"
+          placeholder="enter url here"
+          required
+        /><br />
+
+        <label for="result" class="material-icons">content_copy</label>
+        <input
+          id="result"
+          type="text"
+          placeholder="shortened URL"
+          readonly
+        /><br />
+
+        <button id="shorten-btn">shorten</button>
+      </div>
+      <div id="updates">Paste the URL and hit the shorten button.</div>
+    </div>
+
+    <script>
+      const urlInput = document.getElementById("url");
+      const result = document.getElementById("result");
+      const updates = document.getElementById("updates");
+      const shortenBtn = document.getElementById("shorten-btn");
+      const label = document.querySelector('label[for="result"]');
+
+      label.addEventListener("click", () => {
+        const shortUrl = result.value;
+        if (shortUrl) {
+          navigator.clipboard.writeText(shortUrl);
+          updateMsg("Copied to clipboard!");
+        }
+      });
+
+      shortenBtn.addEventListener("click", async () => {
+        const url = urlInput.value;
+        if (!url) {
+          reportError("Please enter a valid URL!");
+          return;
+        }
+        const data = { url };
+        updateMsg("shortening... please wait!");
+        const response = await postData("/", data);
+        if (response.shortUrl) {
+          updateMsg("URL shortened :)");
+          result.value = `${window.location.protocol}//${window.location.host}/${response.shortUrl}`;
+        } else {
+          reportError("Oops, some error occured, please try later!");
+        }
+      });
+
+      async function postData(url = "", data = {}) {
+        const response = await fetch(url, {
+          method: "POST",
+          mode: "same-origin",
+          cache: "no-cache",
+          credentials: "same-origin",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          redirect: "follow",
+          referrerPolicy: "no-referrer",
+          body: JSON.stringify(data),
+        });
+        return response.json();
+      }
+
+      function reportError(msg = "") {
+        updates.innerText = msg;
+        const color = updates.style.color;
+        updates.style.color = "red";
+        setTimeout(() => {
+          updates.innerText = "Paste the URL and hit the shorten button";
+          updates.style.color = color;
+        }, 3500);
+      }
+
+      function updateMsg(msg = "") {
+        updates.innerText = msg;
+      }
+    </script>
+  </body>
+</html>

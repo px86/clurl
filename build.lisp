@@ -1,0 +1,5 @@
+(ql:quickload :cl-dotenv)
+(.env:load-env (uiop:merge-pathnames* (uiop:getcwd) ".env"))
+(ql:quickload :clurl)
+(asdf:make :clurl)
+(quit)
